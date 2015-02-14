@@ -1,0 +1,20 @@
+{
+	"name": "qualitycontent",
+	"version": "0.0.1",
+	"description": "High Quality Content",
+	"scripts": { 
+		"test": "node test/all.js" 
+	},
+
+	"dependencies": {
+		"cheerio": "0.18.0",
+		"request": "2.53.0",
+		"snoocore": "2.4.1",
+		"string": "3.0.0",
+		"twit": "1.1.19"
+	},
+
+	"devDependencies": { 
+		"test": ">=0.0.5" 
+	}
+}
