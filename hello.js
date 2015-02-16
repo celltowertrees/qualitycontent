@@ -22,10 +22,26 @@ var prepareSamples = function (stuff) {
 // READER
 // 
 
-Reader.webScraper = function () {
-	var Request = require('request');
+Reader.getKinjaTitles = function (page, callback) {
+	var request = require('request'),
+		titles = [];
 
-	console.log('this is the web scraper');
+	request(page, function (error, response, body) {
+		console.log('requestin');
+
+		if (!error && response.statusCode == 200) {
+			var $ = Cheerio.load(body);
+
+			$('.entry-title a').each(function(i, elem) {
+				titles[i] = $(this).text();
+			});
+
+			callback(titles);
+
+		} else {
+			console.log('There was a connection error');
+		}
+	});
 };
 
 Reader.reddit = function () {
