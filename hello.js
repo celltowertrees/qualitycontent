@@ -27,7 +27,6 @@ Reader.getKinjaTitles = function (page, callback) {
 		titles = [];
 
 	request(page, function (error, response, body) {
-		console.log('requestin');
 
 		if (!error && response.statusCode == 200) {
 			var $ = Cheerio.load(body);
@@ -132,11 +131,10 @@ Writer.markovize = function (titles) {
 		if (title.length < min_length) {
 			return make_title(min_length);
 		}
-		console.log(title.length);
 		return title.join(' ');
 	};
 
-	return make_title(140);
+	return make_title(10);
 };
 
 Writer.analyze = function (article) {
@@ -147,8 +145,8 @@ Writer.analyze = function (article) {
 };
 
 
-Reader.kinja('http://kotaku.gawker.com/ajax/post/1685455125/replies', function (comments) {
-	console.log(Writer.markovize(comments));
+Reader.getKinjaTitles('http://newsfeed.gawker.com', function (titles) {
+	console.log(Writer.markovize(titles));
 });
 
 // Reader.tweet('gamergate', function (list) {
