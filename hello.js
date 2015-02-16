@@ -22,27 +22,39 @@ var prepareSamples = function (stuff) {
 // READER
 // 
 
-Reader.getKinjaTitles = function (page, callback) {
+Reader.getKinjaTitles = function (page) {
 	var request = require('request'),
-		titles = [];
+		titles = [],
+		nextPage;
 
-	var getNextPage = function ($) {
+	var getNextPage = function (body) {
+		console.log('getting the next page');
+		var $ = Cheerio.load(body);
+
 		var nextLink = $('.load-more .text-center a');
-		console.log(nextLink.attr('href'));
+		nextPage = nextLink.attr('href');
 	}
 
-	var scrapePage = function (page) {
+	var getTitles = function (body) {
+		console.log('getting titles');
+
+		var $ = Cheerio.load(body);
+
+		$('.entry-title a').each(function(i, elem) {
+			titles[i] = $(this).text();
+		});
+	}
+
+	var scrapePage = function (page, callback) {
 		request(page, function (error, response, body) {
 
 			if (!error && response.statusCode == 200) {
-				var $ = Cheerio.load(body);
+				console.log('scraped');
 
-				$('.entry-title a').each(function(i, elem) {
-					titles[i] = $(this).text();
-				});
+				getTitles(body);
+				getNextPage(body);
 
 				callback(titles);
-				getNextPage($);
 
 			} else {
 				console.log('There was a connection error');
@@ -50,7 +62,15 @@ Reader.getKinjaTitles = function (page, callback) {
 		});
 	}
 
-	scrapePage(page);
+	var crawl = function (page) {
+		console.log('initializing crawler');
+
+		scrapePage(page, function (titles) {
+			console.log(Writer.markovize(titles));
+		});
+	}
+
+	crawl(page);
 };
 
 Reader.reddit = function () {
@@ -155,9 +175,7 @@ Writer.analyze = function (article) {
 };
 
 
-Reader.getKinjaTitles('http://newsfeed.gawker.com', function (titles) {
-	console.log(Writer.markovize(titles));
-});
+Reader.getKinjaTitles('http://newsfeed.gawker.com');
 
 // Reader.tweet('gamergate', function (list) {
 // 	console.log(Writer.markovize(list));
