@@ -26,21 +26,31 @@ Reader.getKinjaTitles = function (page, callback) {
 	var request = require('request'),
 		titles = [];
 
-	request(page, function (error, response, body) {
+	var getNextPage = function ($) {
+		var nextLink = $('.load-more .text-center a');
+		console.log(nextLink.attr('href'));
+	}
 
-		if (!error && response.statusCode == 200) {
-			var $ = Cheerio.load(body);
+	var scrapePage = function (page) {
+		request(page, function (error, response, body) {
 
-			$('.entry-title a').each(function(i, elem) {
-				titles[i] = $(this).text();
-			});
+			if (!error && response.statusCode == 200) {
+				var $ = Cheerio.load(body);
 
-			callback(titles);
+				$('.entry-title a').each(function(i, elem) {
+					titles[i] = $(this).text();
+				});
 
-		} else {
-			console.log('There was a connection error');
-		}
-	});
+				callback(titles);
+				getNextPage($);
+
+			} else {
+				console.log('There was a connection error');
+			}
+		});
+	}
+
+	scrapePage(page);
 };
 
 Reader.reddit = function () {
